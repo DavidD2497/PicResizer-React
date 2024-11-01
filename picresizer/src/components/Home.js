@@ -143,7 +143,7 @@ const Home = () => {
 
                     <article className="panel-center">
                         <div className="image-container" id="imageContainer">
-                            <img id="preview" ref={previewImageRef} alt="Vista previa" style={{ maxWidth: "100%", maxHeight: "100%", transform: `scale(${scale})` }} />
+                            <img id="preview" ref={previewImageRef} style={{ maxWidth: "100%", maxHeight: "100%", transform: `scale(${scale})` }} />
                         </div>
                     </article>
 
