@@ -6,6 +6,7 @@ const Home = () => {
     const anchoInputRef = useRef(null);
     const altoInputRef = useRef(null);
     const [scale, setScale] = useState(1);
+    const [savedImages, setSavedImages] = useState([]);
 
     useEffect(() => {
         const handleFileChange = (event) => {
@@ -120,57 +121,102 @@ const Home = () => {
         }
     };
 
+    const handleSaveClick = () => {
+        const imgSrc = previewImageRef.current.src;
+        const ancho = anchoInputRef.current.value;
+        const alto = altoInputRef.current.value;
+
+        if (imgSrc) {
+            setSavedImages((prevImages) => [
+                ...prevImages,
+                { src: imgSrc, ancho: parseInt(ancho), alto: parseInt(alto) }
+            ]);
+            handleDeleteClick();
+        }
+    };
+
+    const handleSelectSavedImage = (image) => {
+        previewImageRef.current.src = image.src;
+        anchoInputRef.current.value = image.ancho;
+        altoInputRef.current.value = image.alto;
+        previewImageRef.current.onload = function () {
+            const previewImage = previewImageRef.current;
+            previewImage.classList.add('image-loaded');
+            previewImage.style.width = `${image.ancho}px`;
+            previewImage.style.height = `${image.alto}px`;
+        };
+    };
+
+    const handleDeleteSavedImage = (index) => {
+        setSavedImages((prevImages) => prevImages.filter((_, i) => i !== index));
+    };
+
     return (
         <div className="home-page">
             <main>
-                <div className="container">
-                    <article className="panel-left">
-                        <h2>Cargar Imagen</h2>
-                        <button id="btnUpload" className="btn-upload" onClick={handleUploadClick}>
-                            Seleccionar Archivo <i className="fas fa-file-upload"></i>
-                        </button>
-                        <input type="file" id="archivo" accept="image/*" style={{ display: "none" }} ref={fileInputRef} />
-
-                        <h2>Tipo de Imagen</h2>
-                        <select>
-                            <option value="PNG">PNG</option>
-                            <option value="JPG">JPG</option>
-                        </select>
-                        <button className="btn-download" onClick={handleDownloadClick}>
-                            Descargar <i className="fas fa-download"></i>
-                        </button>
-                    </article>
-
-                    <article className="panel-center">
-                        <div className="image-container" id="imageContainer">
-                            <img id="preview" ref={previewImageRef} style={{ maxWidth: "100%", maxHeight: "100%", transform: `scale(${scale})` }} />
-                        </div>
-                    </article>
-
-                    <article className="panel-right">
-                        <h2>Ancho</h2>
-                        <label>
-                            <input className="input_numeros" type="number" name="ancho" defaultValue="0" ref={anchoInputRef} onInput={handleAnchoInput} /> px
-                        </label>
-
-                        <h2>Alto</h2>
-                        <label>
-                            <input type="number" name="alto" defaultValue="0" ref={altoInputRef} onInput={handleAltoInput} /> px
-                        </label>
-
-                        <label>
-                            <input type="checkbox" name="mantener_relacion" id="checkboxMantener" defaultChecked />
-                            Mantener Relación de Aspecto
-                        </label>
-
-                        <button className="btn-delete" onClick={handleDeleteClick}>
-                            Eliminar <i className="fas fa-trash"></i>
-                        </button>
-                    </article>
-                </div>
+                <section className="container">
+                    <div className="panels">
+                        <article className="panel-left">
+                            <h2>Cargar Imagen</h2>
+                            <button id="btnUpload" className="btn-upload" onClick={handleUploadClick}>
+                                Seleccionar Archivo <i className="fas fa-file-upload"></i>
+                            </button>
+                            <input type="file" id="archivo" accept="image/*" style={{ display: "none" }} ref={fileInputRef} />
+                            <h2>Tipo de Imagen</h2>
+                            <select>
+                                <option value="PNG">PNG</option>
+                                <option value="JPG">JPG</option>
+                            </select>
+                            <button className="btn-download" onClick={handleDownloadClick}>
+                                Descargar <i className="fas fa-download"></i>
+                            </button>
+                            <button className="btn-save" onClick={handleSaveClick}>
+                                Guardar <i className="fas fa-save"></i>
+                            </button>
+                        </article>
+                        <article className="panel-center">
+                            <div className="image-container" id="imageContainer">
+                                <img id="preview" ref={previewImageRef} style={{ maxWidth: "100%", maxHeight: "100%", transform: `scale(${scale})` }} />
+                            </div>
+                        </article>
+                        <article className="panel-right">
+                            <h2>Ancho</h2>
+                            <label>
+                                <input className="input_numeros" type="number" name="ancho" defaultValue="0" ref={anchoInputRef} onInput={handleAnchoInput} /> px
+                            </label>
+                            <h2>Alto</h2>
+                            <label>
+                                <input type="number" name="alto" defaultValue="0" ref={altoInputRef} onInput={handleAltoInput} /> px
+                            </label>
+                            <label>
+                                <input type="checkbox" name="mantener_relacion" id="checkboxMantener" defaultChecked />
+                                Mantener Relación de Aspecto
+                            </label>
+                            <button className="btn-delete" onClick={handleDeleteClick}>
+                                Eliminar <i className="fas fa-trash"></i>
+                            </button>
+                        </article>
+                    </div>
+                    <section className="saved-images">
+                        <h2>Imágenes Guardadas</h2>
+                        {savedImages.length > 0 ? (
+                            <ul>
+                                {savedImages.map((image, index) => (
+                                    <li key={index}>
+                                        <img src={image.src} alt={`Imagen guardada ${index + 1}`} style={{ width: '100px', height: 'auto' }} />
+                                        <button className="btn-select-save" onClick={() => handleSelectSavedImage(image)}>Seleccionar</button>
+                                        <button className="btn-delete-save" onClick={() => handleDeleteSavedImage(index)}>Eliminar</button>
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p>No hay imágenes guardadas.</p>
+                        )}
+                    </section>
+                </section>
             </main>
         </div>
-    );
+    );    
 };
 
 export default Home;
