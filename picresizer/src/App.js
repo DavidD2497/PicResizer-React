@@ -9,6 +9,8 @@ import About from './components/About';
 import Contact from './components/Contact';
 import Header from './components/Header'; 
 import Footer from './components/Footer'; 
+import Resultado from './components/Resultado'; 
+
 
 function App() {
   return (
@@ -21,6 +23,7 @@ function App() {
           <Route path='/' element={<Home />} />
           <Route path='/about' element={<About />} />
           <Route path='/contact' element={<Contact />} />
+          <Route path='/resultado' element={<Resultado />} />
         </Routes>
 
         <Footer />
