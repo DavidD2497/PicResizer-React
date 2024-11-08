@@ -8,7 +8,6 @@ const Contacto = () => {
         email: '',
         telefono: '',
         metodoContacto: '',
-        consulta: '',
         mensaje: ''
     });
 
@@ -73,17 +72,6 @@ const Contacto = () => {
                             <option value="">Método de contacto preferencial?</option>
                             <option value="Email">Email</option>
                             <option value="Telefono">Teléfono</option>
-                        </select>
-                        <select
-                            name="consulta"
-                            value={formData.consulta}
-                            onChange={handleChange}
-                        >
-                            <option value="">¿Qué estás buscando?</option>
-                            <option value="Consulta de Venta">Consulta de Venta</option>
-                            <option value="Consulta de Compra">Consulta de Compra</option>
-                            <option value="Consulta de Envío">Consulta de Envío</option>
-                            <option value="Otro">Otro</option>
                         </select>
                     </div>
                     <textarea
