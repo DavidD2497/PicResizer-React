@@ -8,6 +8,12 @@ const Home = () => {
     const [scale, setScale] = useState(1);
     const [savedImages, setSavedImages] = useState([]);
 
+    // Recupera las imágenes guardadas de localStorage cuando la aplicación se carga
+    useEffect(() => {
+        const storedImages = JSON.parse(localStorage.getItem("savedImages")) || [];
+        setSavedImages(storedImages);
+    }, []);
+
     useEffect(() => {
         const handleFileChange = (event) => {
             const file = event.target.files[0];
@@ -127,10 +133,12 @@ const Home = () => {
         const alto = altoInputRef.current.value;
 
         if (imgSrc) {
-            setSavedImages((prevImages) => [
-                ...prevImages,
+            const newImages = [
+                ...savedImages,
                 { src: imgSrc, ancho: parseInt(ancho), alto: parseInt(alto) }
-            ]);
+            ];
+            setSavedImages(newImages);
+            localStorage.setItem("savedImages", JSON.stringify(newImages)); // Guardar en localStorage
             handleDeleteClick();
         }
     };
@@ -148,7 +156,9 @@ const Home = () => {
     };
 
     const handleDeleteSavedImage = (index) => {
-        setSavedImages((prevImages) => prevImages.filter((_, i) => i !== index));
+        const newImages = savedImages.filter((_, i) => i !== index);
+        setSavedImages(newImages);
+        localStorage.setItem("savedImages", JSON.stringify(newImages)); // Actualizar localStorage
     };
 
     return (
