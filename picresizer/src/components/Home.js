@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
+import ImageFilters from "./ImageFilters";
 
 const Home = () => {
     const fileInputRef = useRef(null);
@@ -7,6 +8,7 @@ const Home = () => {
     const altoInputRef = useRef(null);
     const [scale, setScale] = useState(1);
     const [savedImages, setSavedImages] = useState([]);
+    const [currentFilter, setCurrentFilter] = useState('none');
 
     // Recupera las imágenes guardadas de localStorage cuando la aplicación se carga
     useEffect(() => {
@@ -79,6 +81,7 @@ const Home = () => {
         anchoInputRef.current.value = '0';
         altoInputRef.current.value = '0';
         previewImage.classList.remove('image-loaded');
+        setCurrentFilter('none');
     };
 
     const handleDownloadClick = () => {
@@ -94,7 +97,9 @@ const Home = () => {
         const ctx = canvas.getContext('2d');
         canvas.width = ancho;
         canvas.height = alto;
+        ctx.filter = currentFilter;
         ctx.drawImage(previewImageRef.current, 0, 0, canvas.width, canvas.height);
+        ctx.filter = 'none';
         const downloadLink = document.createElement('a');
         downloadLink.href = canvas.toDataURL(`image/${format}`);
         downloadLink.download = `imagen.${format}`;
@@ -135,10 +140,10 @@ const Home = () => {
         if (imgSrc) {
             const newImages = [
                 ...savedImages,
-                { src: imgSrc, ancho: parseInt(ancho), alto: parseInt(alto) }
+                { src: imgSrc, ancho: parseInt(ancho), alto: parseInt(alto), filter: currentFilter }
             ];
             setSavedImages(newImages);
-            localStorage.setItem("savedImages", JSON.stringify(newImages)); // Guardar en localStorage
+            localStorage.setItem("savedImages", JSON.stringify(newImages));
             handleDeleteClick();
         }
     };
@@ -153,12 +158,19 @@ const Home = () => {
             previewImage.style.width = `${image.ancho}px`;
             previewImage.style.height = `${image.alto}px`;
         };
+        previewImageRef.current.style.filter = image.filter;
+        setCurrentFilter(image.filter);
     };
 
     const handleDeleteSavedImage = (index) => {
         const newImages = savedImages.filter((_, i) => i !== index);
         setSavedImages(newImages);
-        localStorage.setItem("savedImages", JSON.stringify(newImages)); // Actualizar localStorage
+        localStorage.setItem("savedImages", JSON.stringify(newImages));
+    };
+
+    const handleFilterChange = (filter) => {
+        setCurrentFilter(filter);
+        previewImageRef.current.style.filter = filter;
     };
 
     return (
@@ -186,8 +198,9 @@ const Home = () => {
                         </article>
                         <article className="panel-center">
                             <div className="image-container" id="imageContainer">
-                                <img id="preview" ref={previewImageRef} style={{ maxWidth: "100%", maxHeight: "100%", transform: `scale(${scale})` }} />
+                                <img id="preview" ref={previewImageRef} style={{ maxWidth: "100%", maxHeight: "100%", transform: `scale(${scale})`, filter: currentFilter }} />
                             </div>
+                            <ImageFilters onFilterChange={handleFilterChange} currentFilter={currentFilter} />
                         </article>
                         <article className="panel-right">
                             <h2>Ancho</h2>
@@ -213,7 +226,7 @@ const Home = () => {
                             <ul>
                                 {savedImages.map((image, index) => (
                                     <li key={index}>
-                                        <img src={image.src} alt={`Imagen guardada ${index + 1}`} style={{ width: '100px', height: 'auto' }} />
+                                        <img src={image.src} alt={`Imagen guardada ${index + 1}`} style={{ width: '100px', height: 'auto', filter: image.filter }} />
                                         <button className="btn-select-save" onClick={() => handleSelectSavedImage(image)}>Seleccionar</button>
                                         <button className="btn-delete-save" onClick={() => handleDeleteSavedImage(index)}>Eliminar</button>
                                     </li>
@@ -230,6 +243,4 @@ const Home = () => {
 };
 
 export default Home;
-
-
 
